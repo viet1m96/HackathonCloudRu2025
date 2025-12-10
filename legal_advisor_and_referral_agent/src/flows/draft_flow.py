@@ -10,6 +10,8 @@ from ..config import (
     MODEL_NAME,
     TEMPERATURE,
     MAX_TOKENS,
+    API_KEY,
+    BASE_URL,
     get_mode_config,
 )
 
@@ -49,6 +51,8 @@ def build_draft_decider_chain() -> RunnableSerializable[dict, Any]:
 
     llm = ChatOpenAI(
         model=MODEL_NAME,
+        api_key=API_KEY,
+        base_url=BASE_URL,
         temperature=0.0,
         max_tokens=8,
     )
@@ -103,6 +107,8 @@ def build_draft_chain() -> RunnableSerializable[dict, Any]:
 
     llm = ChatOpenAI(
         model=MODEL_NAME,
+        api_key=API_KEY,
+        base_url=BASE_URL,
         temperature=TEMPERATURE,
         max_tokens=MAX_TOKENS,
     )

@@ -18,7 +18,6 @@ class LegalAdvisorAgent:
 
     @staticmethod
     def handle_request(
-        self,
         request_payload: Dict[str, Any],
     ) -> Tuple[ModeName, str]:
 
@@ -27,10 +26,6 @@ class LegalAdvisorAgent:
             raise ValueError("Missing 'query' in payload")
 
         law_context: str = request_payload.get("law_context", "") or ""
-
-
-        providers_raw = request_payload.get("providers") or []
-        providers: List[Dict[str, Any]] = list(providers_raw)
 
         extra_notes: Optional[str] = request_payload.get("extra_notes")
 
@@ -42,7 +37,6 @@ class LegalAdvisorAgent:
 
         referral_text = run_referral_flow(
             user_situation=query,
-            providers=providers,
             extra_notes=extra_notes,
         )
 

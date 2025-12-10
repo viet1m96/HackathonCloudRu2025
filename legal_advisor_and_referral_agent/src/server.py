@@ -25,7 +25,6 @@ class A2ARequest(BaseModel):
     mode: Optional[ModeName] = None
     query: str
     law_context: Optional[str] = ""
-    providers: Optional[List[ProviderInput]] = None
     extra_notes: Optional[str] = None
 
 

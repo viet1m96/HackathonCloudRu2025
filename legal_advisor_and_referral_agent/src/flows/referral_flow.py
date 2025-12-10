@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Optional, Any, List, Dict
 
 from langchain_core.runnables import RunnableSerializable
 from langchain_openai import ChatOpenAI
@@ -10,6 +10,8 @@ from ..config import (
     MODEL_NAME,
     TEMPERATURE,
     MAX_TOKENS,
+    API_KEY,
+    BASE_URL,
     get_mode_config,
 )
 from ..mcp_client import (
@@ -83,6 +85,8 @@ def build_referral_decider_chain() -> RunnableSerializable[dict, Any]:
 
     llm = ChatOpenAI(
         model=MODEL_NAME,
+        api_key=API_KEY,
+        base_url=BASE_URL,
         temperature=0.0,
         max_tokens=64,
     )
@@ -125,7 +129,6 @@ def decide_support_tools(
     return selected
 
 
-
 def build_referral_chain() -> RunnableSerializable[dict, Any]:
     mode = get_mode_config("referral")
     system_prompt = mode.load_system_prompt()
@@ -153,6 +156,8 @@ def build_referral_chain() -> RunnableSerializable[dict, Any]:
 
     llm = ChatOpenAI(
         model=MODEL_NAME,
+        api_key=API_KEY,
+        base_url=BASE_URL,
         temperature=TEMPERATURE,
         max_tokens=MAX_TOKENS,
     )
@@ -163,29 +168,25 @@ def build_referral_chain() -> RunnableSerializable[dict, Any]:
 
 def run_referral_flow(
     user_situation: str,
-    providers: Optional[List[Dict[str, Any]]] = None,
     extra_notes: Optional[str] = None,
 ) -> str:
-    if not providers:
-        tool_names = decide_support_tools(
-            user_situation=user_situation,
-            extra_notes=extra_notes,
-        )
+    providers: List[Dict[str, Any]] = []
 
-        all_providers: List[Dict[str, Any]] = []
+    tool_names = decide_support_tools(
+        user_situation=user_situation,
+        extra_notes=extra_notes,
+    )
 
-        for tool_name in tool_names:
-            try:
-                result = call_support_tool(
-                    tool_name=tool_name,
-                    user_situation=user_situation,
-                    extra_notes=extra_notes,
-                )
-                all_providers.extend(result)
-            except SupportMCPError:
-                continue
-
-        providers = all_providers
+    for tool_name in tool_names:
+        try:
+            result = call_support_tool(
+                tool_name=tool_name,
+                user_situation=user_situation,
+                extra_notes=extra_notes,
+            )
+            providers.extend(result)
+        except SupportMCPError:
+            continue
 
     chain = build_referral_chain()
 

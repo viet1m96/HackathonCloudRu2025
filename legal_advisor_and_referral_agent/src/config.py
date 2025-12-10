@@ -1,19 +1,25 @@
 from __future__ import annotations
 
+from dotenv import load_dotenv
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
+import os
 
-
+load_dotenv()
 SRC_DIR = Path(__file__).resolve().parent
 PROMPTS_DIR = SRC_DIR / "prompts"
 
+MODEL_NAME: str = os.getenv("AI_MODEL", "ai-sage/GigaChat3-10B-A1.8B")
 
-MODEL_NAME: str = "unknown"
+API_KEY: str = os.getenv("API_KEY")
 
-TEMPERATURE: float = 0.2
+BASE_URL: str = os.getenv(
+    "API_BASE"
+)
 
-MAX_TOKENS: int = 2000
+TEMPERATURE: float = float(os.getenv("AI_TEMPERATURE", "0.2"))
+MAX_TOKENS: int = int(os.getenv("AI_MAX_TOKENS", "2000"))
 
 
 @dataclass
@@ -47,13 +53,13 @@ MODES: Dict[str, ModeConfig] = {
     ),
     "draft": ModeConfig(
         name="draft",
-        system_prompt_path=PROMPTS_DIR / "system_draft.md",
+        system_prompt_path=PROMPTS_DIR / "style_draft.md",
         examples_prompt_path=None,
         allowed_tools=[],
     ),
     "referral": ModeConfig(
         name="referral",
-        system_prompt_path=PROMPTS_DIR / "system_referral.md",
+        system_prompt_path=PROMPTS_DIR / "style_referral.md",
         examples_prompt_path=None,
         allowed_tools=[
             #still waiting
@@ -65,5 +71,7 @@ MODES: Dict[str, ModeConfig] = {
 def get_mode_config(mode_name: str) -> ModeConfig:
     key = mode_name.strip().lower()
     if key not in MODES:
-        raise ValueError(f"Unknown mode '{mode_name}'. Valid modes: {list(MODES.keys())}")
+        raise ValueError(
+            f"Unknown mode '{mode_name}'. Valid modes: {list(MODES.keys())}"
+        )
     return MODES[key]
