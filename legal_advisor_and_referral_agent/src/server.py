@@ -25,7 +25,7 @@ class A2ARequest(BaseModel):
     mode: Optional[ModeName] = None
     query: str
     law_context: Optional[str] = ""
-    extra_notes: Optional[str] = None
+    relevant_laws: Optional[str] = None
 
 
 class A2AResponse(BaseModel):

@@ -54,13 +54,13 @@ def build_explain_chain() -> RunnableSerializable[dict, Any]:
 def run_explain_flow(
     question: str,
     law_context: str,
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> str:
     chain = build_explain_chain()
 
     combined_context = law_context
-    if extra_notes:
-        combined_context = f"{law_context}\n\n[Additional context]\n{extra_notes}"
+    if relevant_laws:
+        combined_context = f"{law_context}\n\n[Relevant laws]\n{relevant_laws}"
 
     resp = chain.invoke(
         {

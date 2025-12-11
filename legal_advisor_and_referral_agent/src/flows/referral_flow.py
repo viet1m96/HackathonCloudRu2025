@@ -73,7 +73,7 @@ def build_referral_decider_chain() -> RunnableSerializable[dict, Any]:
                 "human",
                 (
                     "User situation:\n{user_situation}\n\n"
-                    "Extra notes (may be empty):\n{extra_notes}\n\n"
+                    "Relevant laws (may be empty):\n{relevant_laws}\n\n"
                     "Remember: reply with exactly either:\n"
                     "- 'NO_TOOL'\n"
                     "or\n"
@@ -97,14 +97,14 @@ def build_referral_decider_chain() -> RunnableSerializable[dict, Any]:
 
 def decide_support_tools(
     user_situation: str,
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> List[str]:
     chain = build_referral_decider_chain()
 
     resp = chain.invoke(
         {
             "user_situation": user_situation,
-            "extra_notes": extra_notes or "",
+            "relevant_laws": relevant_laws or "",
         }
     )
 
@@ -168,13 +168,13 @@ def build_referral_chain() -> RunnableSerializable[dict, Any]:
 
 def run_referral_flow(
     user_situation: str,
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> str:
     providers: List[Dict[str, Any]] = []
 
     tool_names = decide_support_tools(
         user_situation=user_situation,
-        extra_notes=extra_notes,
+        relevant_laws=relevant_laws,
     )
 
     for tool_name in tool_names:
@@ -182,7 +182,7 @@ def run_referral_flow(
             result = call_support_tool(
                 tool_name=tool_name,
                 user_situation=user_situation,
-                extra_notes=extra_notes,
+                relevant_laws=relevant_laws,
             )
             providers.extend(result)
         except SupportMCPError:
@@ -193,8 +193,6 @@ def run_referral_flow(
     provider_block = format_providers_for_context(providers or [])
 
     situation_block = user_situation
-    if extra_notes:
-        situation_block = f"{user_situation}\n\n[Additional preferences]\n{extra_notes}"
 
     resp = chain.invoke(
         {

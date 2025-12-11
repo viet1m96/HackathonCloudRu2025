@@ -42,7 +42,7 @@ def build_draft_decider_chain() -> RunnableSerializable[dict, Any]:
                 (
                     "User request:\n{request_description}\n\n"
                     "Legal / contextual information (may be empty):\n{law_context}\n\n"
-                    "Extra notes (may be empty):\n{extra_notes}\n\n"
+                    "Relevant laws (may be empty):\n{relevant_laws}\n\n"
                     "Remember: reply with exactly 'DRAFT' or 'NO_DRAFT'."
                 ),
             ),
@@ -64,7 +64,7 @@ def build_draft_decider_chain() -> RunnableSerializable[dict, Any]:
 def decide_should_draft(
     request_description: str,
     law_context: str = "",
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> bool:
 
     chain = build_draft_decider_chain()
@@ -73,7 +73,7 @@ def decide_should_draft(
         {
             "request_description": request_description,
             "law_context": law_context or "",
-            "extra_notes": extra_notes or "",
+            "relevant_laws": relevant_laws or "",
         }
     )
 
@@ -120,12 +120,12 @@ def build_draft_chain() -> RunnableSerializable[dict, Any]:
 def run_draft_flow(
     request_description: str,
     law_context: str = "",
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> str:
     should_draft = decide_should_draft(
         request_description=request_description,
         law_context=law_context,
-        extra_notes=extra_notes,
+        relevant_laws=relevant_laws,
     )
 
     if not should_draft:
@@ -141,8 +141,6 @@ def run_draft_flow(
     chain = build_draft_chain()
 
     combined_context = law_context
-    if extra_notes:
-        combined_context = f"{law_context}\n\n[Additional context]\n{extra_notes}"
 
     resp = chain.invoke(
         {

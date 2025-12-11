@@ -20,7 +20,7 @@ SUPPORT_MCP_TOOLS: Dict[str, str] = {
 def call_support_tool(
     tool_name: str,
     user_situation: str,
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     path = SUPPORT_MCP_TOOLS.get(tool_name)
     if not path:
@@ -30,8 +30,8 @@ def call_support_tool(
     url = f"{base}{path}"
 
     payload: Dict[str, Any] = {"situation": user_situation}
-    if extra_notes:
-        payload["extra_notes"] = extra_notes
+    if relevant_laws:
+        payload["relevant_laws"] = relevant_laws
 
     try:
         resp = requests.post(url, json=payload, timeout=10)
@@ -66,10 +66,10 @@ def call_support_tool(
 
 def search_support_providers(
     user_situation: str,
-    extra_notes: Optional[str] = None,
+    relevant_laws: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     return call_support_tool(
         tool_name="support.search_providers",
         user_situation=user_situation,
-        extra_notes=extra_notes,
+        relevant_laws=relevant_laws,
     )

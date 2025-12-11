@@ -27,23 +27,23 @@ class LegalAdvisorAgent:
 
         law_context: str = request_payload.get("law_context", "") or ""
 
-        extra_notes: Optional[str] = request_payload.get("extra_notes")
+        relevant_laws: Optional[str] = request_payload.get("relevant_laws")
 
         explain_text = run_explain_flow(
             question=query,
             law_context=law_context,
-            extra_notes=extra_notes,
+            relevant_laws=relevant_laws,
         )
 
         referral_text = run_referral_flow(
             user_situation=query,
-            extra_notes=extra_notes,
+            relevant_laws=relevant_laws,
         )
 
         draft_text = run_draft_flow(
             request_description=query,
             law_context=law_context,
-            extra_notes=extra_notes,
+            relevant_laws=relevant_laws,
         )
 
         full_answer = (
