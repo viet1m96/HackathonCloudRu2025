@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import json
 from contextlib import asynccontextmanager
 from typing import Optional
 
@@ -62,7 +63,11 @@ async def search_entity(query: str, obj: str) -> str:
     try:
         client = get_client()
         entities = await client.search_entity(query.strip(), obj)
-        return [entity.model_dump() for entity in entities] if entities else []
+        if entities:
+            data = [entity.model_dump() for entity in entities]
+            return json.dumps(data, ensure_ascii=False, indent=2)
+        else:
+            return "[]"
     except Exception as e:
         logger.error(f"Error searching for '{query}': {e}")
         return f"{{\"error\": \"{str(e)}\"}}"
